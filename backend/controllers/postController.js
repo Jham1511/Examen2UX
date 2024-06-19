@@ -1,28 +1,26 @@
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const uri = "mongodb+srv://hamjosue33:<password>@examen2ux.mp3u7jm.mongodb.net/?retryWrites=true&w=majority&appName=Examen2UX";
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = "mongodb+srv://hamjosue33:BpexblLPYeSj9lX9@examen2ux.mp3u7jm.mongodb.net/?retryWrites=true&w=majority&appName=Examen2UX";
 
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  },
+  }
 });
 
 async function run() {
   try {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!".rainbow
-    );
-  } catch (error) {
-    console.log("Conexión a MongoDB fallida".red);
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    await client.close();
   }
 }
 run().catch(console.dir);
 
-const database = client.db("examenux");
+const database = client.db("Examen2UX");
 const posts = database.collection("Post");
 const Post = require("../models/postModel");
 const { query } = require("express");
@@ -67,7 +65,6 @@ const editPost = async (req, res) => {
       msg: "No hay posts guardados",
     });
   }
-  // Validar si existe el post con el id recibido
   if (await !posts.findOne({ _id: new ObjectId(req.params.id) })) {
     return res.status(500).send({
       msg: `No se encontró ningún post con id ${res.body.id}`,

@@ -1,23 +1,16 @@
-const express = require('express');
+const express = require("express");
+const colors = require("colors");
+const dotenv = require("dotenv").config();
+const port = process.env.PORT || 3000;
+
 const app = express();
-require('dotenv').config();
-const mongoose = require('mongoose');
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 
-// Routes
-const authRoutes = require('./routes/auth');
-const postRoutes = require('./routes/posts');
+const authRoutes = require('../backend/routes/auth');
+const postRoutes = require('../backend/routes/posts');
 app.use('/auth', authRoutes);
 app.use('/posts', postRoutes);
 
-// Connect to MongoDB 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected...'))
-  .catch(err => console.log(err));
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(port, () => console.log(`Server started on ${port}`));
