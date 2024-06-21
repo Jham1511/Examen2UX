@@ -1,5 +1,6 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://hamjosue33:BpexblLPYeSj9lX9@examen2ux.mp3u7jm.mongodb.net/?retryWrites=true&w=majority&appName=Examen2UX";
+const ObjectId = require('mongodb').ObjectId;
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -18,6 +19,7 @@ async function run() {
     await client.close();
   }
 }
+
 run().catch(console.dir);
 
 const database = client.db("Examen2UX");
@@ -26,6 +28,7 @@ const Post = require("../models/postModel");
 const { query } = require("express");
 
 const createPost = async (req, res) => {
+  await client.connect();
   const post = await new Post({
     titulo: req.body.titulo,
     texto: req.body.texto,
@@ -40,9 +43,11 @@ const createPost = async (req, res) => {
     msg: "Post creado exitosamente",
     data: result.insertedId,
   });
+  await client.close();
 };
 
 const listPosts = async (req, res) => {
+  await client.connect();
   if ((await posts.countDocuments()) === 0) {
     res.status(200).send({
       msg: "No hay posts guardados",
@@ -56,10 +61,12 @@ const listPosts = async (req, res) => {
   res.status(200).send({
     documentos: arrPosts,
   });
+  await client.close();
 };
 
 
 const editPost = async (req, res) => {
+  await client.connect();
   if ((await posts.countDocuments()) === 0) {
     res.status(200).send({
       msg: "No hay posts guardados",
@@ -78,26 +85,29 @@ const editPost = async (req, res) => {
   const result = await posts.updateOne(filter, update, options);
 
   res.status(200).send("El post fue editado exitosamente");
+  await client.close();
 };
 
 
 const deletePost = async (req, res) => {
+  await client.connect();
   if ((await posts.countDocuments()) === 0) {
     res.status(200).send({
       msg: "No hay posts guardados",
     });
   }
+
   if (await !posts.findOne({ _id: new ObjectId(req.params.id) })) {
     return res.status(500).send({
       msg: `No se encontró ningún post con id ${res.body.id}`,
     });
   }
-
+  
   
   const filter = { _id: new ObjectId(req.params.id) };
   const result = await posts.deleteOne(filter);
-
   res.status(200).send("El post fue eliminado exitosamente");
+  await client.close();
 };
 
 module.exports = {
